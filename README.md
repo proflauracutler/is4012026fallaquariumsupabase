@@ -108,8 +108,8 @@ const SUPABASE_KEY = 'YOUR_ANON_KEY'      // <-- paste here
 const USE_SUPABASE = false                // <-- change to true once credentials are filled in
 ```
 
-3. Replace `'YOUR_PROJECT_URL'` with your Project URL (keep the quotes).
-4. Replace `'YOUR_ANON_KEY'` with your anon/public key (keep the quotes).
+3. Replace `'YOUR_PROJECT_URL'` with your Project URL (keep the quotes). The URL should end in `.supabase.co` with nothing after it — do not include `/rest/v1/` or any other path.
+4. Replace `'YOUR_ANON_KEY'` with your publishable key (keep the quotes).
 5. Change `false` to `true` on the `USE_SUPABASE` line.
 6. Save the file (Ctrl+S / Cmd+S).
 
