@@ -84,11 +84,12 @@ Your database is ready.
 
 These are the two pieces of information your app needs to talk to your database.
 
-1. In the left sidebar, click **Project Settings** (the gear icon at the bottom).
-2. Click **API** in the settings menu.
-3. You will see two things you need:
-   - **Project URL** — looks like `https://abcdefgh.supabase.co`
-   - **anon / public key** — a long string starting with `eyJ...`
+1. In the left sidebar, click **Project Settings** (the gear icon near the bottom).
+2. You need two things from two different sections:
+
+   **Your Project URL** — click **Data API** in the settings menu. Your URL is at the top of that page. It looks like `https://abcdefgh.supabase.co`.
+
+   **Your anon key** — click **API Keys** in the settings menu. Copy the key listed as **anon / public**. It is a long string starting with `eyJ...`. (Do not use the service_role key — that one has admin access and should never go in a frontend file.)
 
 Keep this browser tab open — you will need both values in the next step.
 
