@@ -100,7 +100,7 @@ Keep this browser tab open — you will need both values in the next step.
 ### Step 8: Add your credentials to the app
 
 1. Open `index.html` in VS Code (right-click the file → Open with → VS Code, or open VS Code and drag the file in).
-2. Find these three lines near the top of the `<script>` section (around line 95):
+2. Use Find (Ctrl+F / Cmd+F) and search for `YOUR_PROJECT_URL` to jump straight to the right spot. You are looking for these three lines:
 
 ```js
 const SUPABASE_URL = 'YOUR_PROJECT_URL'   // <-- paste here
