@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean View Aquarium</title>
+
+  <!-- Supabase client (loaded from CDN -- does nothing until you fill in your credentials below) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0a1628;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Banner ── */
+    #banner {
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    #banner.disconnected { background: #7c2d12; color: #fed7aa; }
+    #banner.connected    { background: #14532d; color: #bbf7d0; }
+    #banner strong { color: #fff; }
+    #banner button {
+      display: inline-block;
+      margin-left: 12px;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.88em;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    #banner.disconnected button { background: #9a3412; color: #fed7aa; }
+    #banner.connected    button { background: #166534; color: #bbf7d0; }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(180deg, #0f2744 0%, #0a1e3d 100%);
+      border-bottom: 1px solid #1e3a5f;
+      padding: 28px 32px 20px;
+    }
+    .header-inner {
+      max-width: 860px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .logo { font-size: 2em; line-height: 1; }
+    .site-title h1 { font-size: 1.6em; font-weight: 700; color: #e0f2fe; letter-spacing: -0.01em; }
+    .site-title p  { font-size: 0.9em; color: #7dd3fc; margin-top: 2px; }
+    .fish-count {
+      background: #1e3a5f; border: 1px solid #2d5186;
+      border-radius: 8px; padding: 10px 18px; text-align: center; min-width: 90px;
+    }
+    .fish-count .num   { font-size: 1.8em; font-weight: 700; color: #38bdf8; line-height: 1; }
+    .fish-count .label { font-size: 0.75em; color: #7dd3fc; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Layout ── */
+    main {
+      max-width: 860px; margin: 32px auto; padding: 0 24px;
+      display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start;
+    }
+    .section-label {
+      font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #7dd3fc; font-weight: 600; margin-bottom: 12px;
+    }
+
+    /* ── Fish cards ── */
+    #fish-list { display: flex; flex-direction: column; gap: 10px; }
+    .fish-card {
+      background: #0f2744; border: 1px solid #1e3a5f;
+      border-radius: 10px; padding: 14px 18px;
+      display: flex; align-items: center; gap: 14px;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; } }
+    .fish-emoji  { font-size: 1.8em; line-height: 1; flex-shrink: 0; }
+    .fish-info   { flex: 1; }
+    .fish-name   { font-weight: 600; font-size: 1em; color: #e0f2fe; }
+    .fish-meta   { font-size: 0.83em; color: #7dd3fc; margin-top: 2px; }
+    .fish-badge  {
+      font-size: 0.72em; background: #1e3a5f; border: 1px solid #2d5186;
+      color: #93c5fd; border-radius: 4px; padding: 2px 7px; white-space: nowrap;
+    }
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: #4a6fa5;
+      background: #0f2744; border: 1px dashed #1e3a5f; border-radius: 10px;
+    }
+    .empty-state .empty-icon { font-size: 2.5em; margin-bottom: 10px; }
+    .empty-state p { font-size: 0.9em; }
+
+    /* ── Form panel ── */
+    .form-panel {
+      background: #0f2744; border: 1px solid #1e3a5f;
+      border-radius: 12px; padding: 22px 20px;
+      position: sticky; top: 24px;
+    }
+    .form-panel h2 { font-size: 1em; font-weight: 600; color: #e0f2fe; margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; }
+    label {
+      display: block; font-size: 0.8em; font-weight: 500; color: #7dd3fc;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%; background: #0a1628; border: 1px solid #2d5186;
+      border-radius: 6px; color: #e2e8f0; font-size: 0.93em;
+      padding: 8px 12px; font-family: inherit; outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: #38bdf8; }
+    select option { background: #0a1628; }
+    button[type="submit"] {
+      width: 100%; background: #0369a1; color: #fff; border: none;
+      border-radius: 7px; padding: 10px; font-size: 0.95em; font-weight: 600;
+      font-family: inherit; cursor: pointer; margin-top: 4px; transition: background 0.15s;
+    }
+    button[type="submit"]:hover { background: #0284c7; }
+    #db-status {
+      margin-top: 14px; padding: 10px 12px; border-radius: 7px;
+      font-size: 0.8em; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;
+    }
+    #db-status.disconnected { background: #3f1006; border: 1px solid #7c2d12; color: #fed7aa; }
+    #db-status.connected    { background: #052e16; border: 1px solid #166534; color: #bbf7d0; }
+    #db-status .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+    #db-status.disconnected .dot { background: #f97316; }
+    #db-status.connected    .dot { background: #4ade80; }
+
+    @media (max-width: 600px) {
+      main { grid-template-columns: 1fr; }
+      .form-panel { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="banner" class="disconnected">
+    <strong>Demo mode:</strong> No database connected -- changes will disappear when you refresh.
+    <button onclick="location.reload()">Try refreshing &rarr;</button>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="logo">🐠</div>
+        <div class="site-title">
+          <h1>Ocean View Aquarium</h1>
+          <p>Our fish collection</p>
+        </div>
+      </div>
+      <div class="fish-count">
+        <div class="num" id="count">0</div>
+        <div class="label">Fish</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div>
+      <div class="section-label">Fish in the tank</div>
+      <div id="fish-list"></div>
+    </div>
+
+    <div class="form-panel">
+      <h2>&#43; Add a fish</h2>
+      <form id="add-form">
+        <div class="form-group">
+          <label for="fish-name">Name</label>
+          <input id="fish-name" type="text" placeholder="e.g. Bubbles" required>
+        </div>
+        <div class="form-group">
+          <label for="fish-species">Species</label>
+          <select id="fish-species" required>
+            <option value="">-- choose one --</option>
+            <option>Clownfish</option>
+            <option>Blue Tang</option>
+            <option>Goldfish</option>
+            <option>Betta</option>
+            <option>Angelfish</option>
+            <option>Guppy</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fish-color">Color</label>
+          <input id="fish-color" type="text" placeholder="e.g. Orange &amp; White">
+        </div>
+        <button type="submit">Add to tank</button>
+      </form>
+      <div id="db-status" class="disconnected">
+        <div class="dot"></div>
+        <div id="db-status-text">Saving to memory only. Follow the README to connect Supabase.</div>
+      </div>
+    </div>
+  </main>
+
+<script>
+// =============================================================
+//  YOUR SUPABASE CREDENTIALS
+//  Step 1: Paste your Project URL below (from Supabase dashboard)
+//  Step 2: Paste your anon/public key below
+//  Step 3: Change USE_SUPABASE to true
+// =============================================================
+
+const SUPABASE_URL = 'YOUR_PROJECT_URL'   // <-- paste here
+const SUPABASE_KEY = 'YOUR_ANON_KEY'      // <-- paste here
+const USE_SUPABASE = false                // <-- change to true once credentials are filled in
+
+// =============================================================
+//  NOTHING BELOW THIS LINE NEEDS TO BE EDITED
+// =============================================================
+
+// Hardcoded starting fish (visible in demo mode; replaced by database data once connected)
+let memoryFish = [
+  { id: 1, name: 'Bubbles',  species: 'Goldfish',  color: 'Orange' },
+  { id: 2, name: 'Nemo',     species: 'Clownfish', color: 'Orange & White' },
+  { id: 3, name: 'Dory',     species: 'Blue Tang', color: 'Blue & Yellow' },
+]
+let nextId = 4
+
+// Set up Supabase client (only used when USE_SUPABASE is true)
+let db = null
+if (USE_SUPABASE) {
+  db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+}
+
+// -- Load fish from the database (or from memory) --
+async function loadFish() {
+  if (USE_SUPABASE) {
+    const { data, error } = await db.from('fish').select('*').order('created_at', { ascending: false })
+    if (error) { showError(error.message); return }
+    renderFish(data)
+    setConnected()
+  } else {
+    renderFish(memoryFish)
+  }
+}
+
+// -- Save a new fish to the database (or to memory) --
+async function saveFish(name, species, color) {
+  if (USE_SUPABASE) {
+    const { data, error } = await db.from('fish').insert([{ name, species, color }]).select()
+    if (error) { showError(error.message); return }
+    await loadFish()
+  } else {
+    memoryFish.unshift({ id: nextId++, name, species, color })
+    renderFish(memoryFish)
+  }
+}
+
+// -- Render the fish list --
+function renderFish(fish) {
+  const list = document.getElementById('fish-list')
+  document.getElementById('count').textContent = fish.length
+
+  if (fish.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🪣</div>
+        <p>No fish yet. Add one using the form!</p>
+      </div>`
+    return
+  }
+
+  const emoji = { 'Clownfish': '🐠', 'Blue Tang': '🐟', 'Goldfish': '🐡', 'Betta': '🐠', 'Angelfish': '🐡', 'Guppy': '🐟' }
+  list.innerHTML = fish.map(f => `
+    <div class="fish-card">
+      <div class="fish-emoji">${emoji[f.species] || '🐠'}</div>
+      <div class="fish-info">
+        <div class="fish-name">${f.name}</div>
+        <div class="fish-meta">${f.color || 'Color unknown'}</div>
+      </div>
+      <div class="fish-badge">${f.species}</div>
+    </div>
+  `).join('')
+}
+
+// -- Update UI when connected --
+function setConnected() {
+  document.getElementById('banner').className = 'connected'
+  document.getElementById('banner').innerHTML =
+    '<strong>Connected to Supabase!</strong> Fish are saved to your database. ' +
+    '<button onclick="location.reload()">Refresh to verify &rarr;</button>'
+  document.getElementById('db-status').className = 'connected'
+  document.getElementById('db-status-text').textContent = 'Saving to Supabase. Changes will survive a page refresh.'
+}
+
+// -- Show an error if Supabase call fails --
+function showError(msg) {
+  document.getElementById('db-status-text').textContent = 'Supabase error: ' + msg + ' -- check your URL, key, and that RLS is disabled.'
+}
+
+// -- Form handler --
+document.getElementById('add-form').addEventListener('submit', async function(e) {
+  e.preventDefault()
+  const name    = document.getElementById('fish-name').value.trim()
+  const species = document.getElementById('fish-species').value
+  const color   = document.getElementById('fish-color').value.trim()
+  if (!name || !species) return
+  await saveFish(name, species, color)
+  this.reset()
+  document.getElementById('fish-name').focus()
+})
+
+// Load fish on startup
+loadFish()
+</script>
+
+</body>
+</html>
