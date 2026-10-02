@@ -89,7 +89,7 @@ These are the two pieces of information your app needs to talk to your database.
 
    **Your Project URL** — click **Data API** in the settings menu. Your URL is at the top of that page. It looks like `https://abcdefgh.supabase.co`.
 
-   **Your anon key** — click **API Keys** in the settings menu. Copy the key listed as **anon / public**. It is a long string starting with `eyJ...`. (Do not use the service_role key — that one has admin access and should never go in a frontend file.)
+   **Your publishable key** — click **API Keys** in the settings menu. Under **Publishable key**, copy the key that starts with `sb_publishable_...`. (Do not use the Secret key — that one has admin access and should never go in a frontend file.)
 
 Keep this browser tab open — you will need both values in the next step.
 
@@ -113,7 +113,7 @@ Example of what it should look like after your edits:
 
 ```js
 const SUPABASE_URL = 'https://abcdefgh.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+const SUPABASE_KEY = 'sb_publishable_xxxxxxxxxxxxxxxx...'
 const USE_SUPABASE = true
 ```
 
