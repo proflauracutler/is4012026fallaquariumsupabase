@@ -30,9 +30,13 @@ A simple web app that demonstrates the difference between a frontend-only app an
 
 ### Step 2: Open the app in your browser
 
-1. Open the unzipped folder.
-2. Double-click `index.html`. It should open in your browser.
-3. You should see the aquarium with three starter fish and an orange **"Demo mode"** banner at the top.
+Do not double-click the file to open it — that loads it as a `file://` URL, which Chrome blocks from making requests to external services like Supabase. Use **Live Server** instead:
+
+1. Open VS Code.
+2. Install the **Live Server** extension if you do not have it yet: click the Extensions icon on the left sidebar (or press Ctrl+Shift+X / Cmd+Shift+X), search for "Live Server" by Ritwick Dey, and click Install.
+3. Open the `aquarium-github` folder in VS Code (File → Open Folder).
+4. Right-click `index.html` in the Explorer panel on the left → **Open with Live Server**.
+5. Your browser should open automatically at `http://127.0.0.1:5500`. You should see the aquarium with three starter fish and an orange **"Demo mode"** banner at the top.
 
 ### Step 3: Try the demo
 
@@ -119,7 +123,7 @@ const USE_SUPABASE = true
 
 ### Step 9: Test it
 
-1. Refresh (or reopen) `index.html` in your browser.
+1. Save `index.html` in VS Code (Ctrl+S / Cmd+S). Live Server will refresh the page automatically.
 2. The banner at the top should turn **green** and say "Connected to Supabase!"
 3. Add a fish using the form.
 4. Refresh the page.
