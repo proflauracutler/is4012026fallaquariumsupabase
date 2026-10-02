@@ -108,7 +108,10 @@ const SUPABASE_KEY = 'YOUR_ANON_KEY'      // <-- paste here
 const USE_SUPABASE = false                // <-- change to true once credentials are filled in
 ```
 
-3. Replace `'YOUR_PROJECT_URL'` with your Project URL (keep the quotes). The URL should end in `.supabase.co` with nothing after it — do not include `/rest/v1/` or any other path.
+3. Replace `'YOUR_PROJECT_URL'` with your Project URL (keep the quotes).
+
+> [!WARNING]
+> The URL must end in `.supabase.co` with **nothing after it**. If you copied it from the API settings page it may include `/rest/v1/` at the end — delete that part or the app will not be able to reach your database.
 4. Replace `'YOUR_ANON_KEY'` with your publishable key (keep the quotes).
 5. Change `false` to `true` on the `USE_SUPABASE` line.
 6. Save the file (Ctrl+S / Cmd+S).
@@ -135,7 +138,8 @@ const USE_SUPABASE = true
 
 **Banner is still orange after I set USE_SUPABASE to true**
 - Double-check that you saved the file after editing it.
-- Make sure there are no typos in your URL or key — they should still be inside single quotes.
+- Check your Project URL — it must end in `.supabase.co` with nothing after it. If it includes `/rest/v1/` at the end, delete that part.
+- Make sure there are no other typos in your URL or key — they should still be inside single quotes.
 - Open the browser's developer tools (F12 → Console tab) and look for an error message.
 
 **I see a Supabase error about RLS or permissions**
